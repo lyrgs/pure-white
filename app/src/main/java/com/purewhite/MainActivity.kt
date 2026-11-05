@@ -2,7 +2,6 @@ package com.purewhite
 
 import android.app.Activity
 import android.content.Intent
-import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -12,13 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 
 class MainActivity : Activity() {
-    private val captureRequest = 4102
-    private lateinit var projectionManager: MediaProjectionManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        projectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(28, 40, 28, 24)
@@ -34,7 +28,7 @@ class MainActivity : Activity() {
             }
         })
         layout.addView(Button(this).apply {
-            text = "开始颜色采样"
+            text = "共享屏幕取色"
             setOnClickListener {
                 if (!Settings.canDrawOverlays(this@MainActivity)) {
                     startActivity(Intent(
@@ -43,14 +37,15 @@ class MainActivity : Activity() {
                     ))
                     Toast.makeText(
                         this@MainActivity,
-                        "请允许悬浮窗权限，返回后再次点击采样。",
+                        "请允许悬浮窗权限，返回后再次点击取色。",
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
-                    startActivityForResult(
-                        projectionManager.createScreenCaptureIntent(),
-                        captureRequest
-                    )
+                    // 先把白屏 Activity 放到前台，再由它请求录屏授权。
+                    // 授权返回时不再从后台 MainActivity 启动新 Activity。
+                    startActivity(Intent(this@MainActivity, WhiteTestActivity::class.java).apply {
+                        putExtra(WhiteTestActivity.EXTRA_START_CAPTURE, true)
+                    })
                 }
             }
         })
@@ -59,32 +54,5 @@ class MainActivity : Activity() {
             textSize = 14f
         })
         setContentView(layout)
-    }
-
-    @Deprecated("Deprecated in Android")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != captureRequest) return
-
-        if (resultCode != RESULT_OK || data == null) {
-            Toast.makeText(this, "未获得屏幕录制授权，请重新开始采样。", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        try {
-            val serviceIntent = Intent(this, CaptureService::class.java).apply {
-                putExtra("resultCode", resultCode)
-                putExtra("captureData", data)
-            }
-            startForegroundService(serviceIntent)
-            Toast.makeText(this, "采样服务正在启动，马上进入白屏。", Toast.LENGTH_LONG).show()
-            startActivity(Intent(this, WhiteTestActivity::class.java))
-        } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                "启动采样失败：" + (e.message ?: e.javaClass.simpleName),
-                Toast.LENGTH_LONG
-            ).show()
-        }
     }
 }
