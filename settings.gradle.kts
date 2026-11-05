@@ -1,29 +1,18 @@
-
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-}
-
-android {
-    namespace = "com.purewhite"
-    compileSdk = 36
-
-    defaultConfig {
-        applicationId = "com.purewhite"
-        minSdk = 29
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "17"
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
     }
 }
+
+rootProject.name = "PureWhite"
+include(":app")
