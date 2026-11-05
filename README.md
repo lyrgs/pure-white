@@ -1,21 +1,21 @@
-# Pure White 1.1
+# Pure White 1.2（启动流程修正版源码）
 
-## 功能
-- 全屏 RGB(255,255,255) 白色测试画面
-- 屏幕录制授权后自动进入白屏
-- 左上角深色悬浮窗显示中心 5×5 像素平均 RGB
-- 每秒更新并保存最近 500 条采样记录
+## 本次调整
+- 点击“共享屏幕取色”后，先打开全屏白色 Activity。
+- 屏幕共享授权对话框由前台白屏 Activity 发起。
+- 授权成功后，由当前白屏 Activity 启动 CaptureService，不再从返回后台的 MainActivity 启动另一个 Activity。
+- 目的是避开部分 Android 系统/厂商系统对后台 Activity 启动的限制。
 
 ## 构建
-使用 Android Studio 打开项目根目录，等待 Gradle Sync，然后 Build > Build APK(s)。
+使用 Android Studio 打开项目根目录，等待 Gradle Sync，然后选择 Build > Build APK(s)。
+生成的 APK 通常位于 app/build/outputs/apk/debug/app-debug.apk。
 
 ## 使用
-1. 安装 APK。
-2. 在系统设置中允许 Pure White 显示在其他应用上层。
-3. 打开 Pure White，点击“开始颜色采样”。
-4. 在 Android 系统提示中允许屏幕录制。
-5. App 会启动采样服务并自动进入全屏白色画面。
-6. 左上角深色悬浮框显示 RGB。
+1. 安装新 APK（若签名不一致，系统可能要求先卸载旧版；卸载前请注意历史数据会丢失）。
+2. 允许 Pure White“显示在其他应用上层”。
+3. 点击“共享屏幕取色”。
+4. 系统询问屏幕共享时选择允许。
+5. 授权返回后应停留在白屏页面；悬浮窗显示 RGB 读数。
 
 ## 注意
-屏幕截图 RGB 不是面板实际发光色度测量值。HyperOS 显示驱动、护眼/低蓝光及硬件色温处理可能不体现在截图像素中。真实白点校准需要外置色度计。
+这是针对启动顺序的源码修正版，尚未在真实 Android 17 / HyperOS 4.0.3.0 设备上编译和验证。截图 RGB 不等于面板真实发光色度；硬件色温/低蓝光处理可能不会反映在截图中。
